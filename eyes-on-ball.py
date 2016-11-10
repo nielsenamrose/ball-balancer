@@ -12,7 +12,8 @@ def sendMessage(message):
     
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_address = ('localhost', 21567)
+#server_address = ('localhost', 21567)
+server_address = ('203.6.152.96', 21567)
 cap = cv2.VideoCapture(0)
 
 while(1):

@@ -10,7 +10,7 @@ import socket
 UDPSock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 listen_addr = ("",21567)
 UDPSock.bind(listen_addr)
-print "Server started"
+print "Server listening on {0}".format(listen_addr)
 
 while True:
         data,addr = UDPSock.recvfrom(1024)
