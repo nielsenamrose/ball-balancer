@@ -7,8 +7,8 @@ Created on Fri Nov 11 08:12:25 2016
 
 import socket
 
-pwm0path = "d:/temp/pwm0" #"/sys/class/pwm/pwmchip0/pwm0"
-pwm1path = "d:/temp/pwm1" #"/sys/class/pwm/pwmchip0/pwm1"
+pwm0path = "/sys/class/pwm/pwmchip0/pwm0"
+pwm1path = "/sys/class/pwm/pwmchip0/pwm1"
 
 def clamp(minx, maxx, x):
     if (x < minx):
@@ -23,20 +23,18 @@ def calculateduty(v):
     return clamp(900000, 2100000, duty)
 
 def setvalue(path, value):
-    f = open(path,"w")    
+    f = open(path,"w")   
     f.write(str(value))
-    f.close()
     
 def startpwm(path, period):
     setvalue(path+"/period", period)    
-    setvalue(path+"/enabled", 1)
+    setvalue(path+"/enable", 1)
     
 def setdutycycle(path, dutycycle):
     setvalue(path+"/duty_cycle", dutycycle)
 
 def setangle(pwmpath, angle):
     duty = calculateduty(angle)
-    print duty
     setdutycycle(pwmpath, duty)
 
 UDPSock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
