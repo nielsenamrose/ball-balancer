@@ -25,7 +25,7 @@ def angle_to_q(v):
     d = math.sqrt(d_sq)
     if d < (L1+L2):
         beta = math.acos((L1*L1 + d_sq - L2*L2)/(2.0*L1*d))
-    elif
+    else:
         beta = 0
     q = beta + alpha - math.pi
     return q
