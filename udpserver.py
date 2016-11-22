@@ -22,7 +22,11 @@ def angle_to_q(v):
     By = L4 - L3*math.sin(v)
     alpha = math.atan2(By,Bx)
     d_sq = Bx*Bx + By*By
-    beta = math.acos((L1*L1 + d_sq - L2*L2)/(2.0*L1*math.sqrt(d_sq)))
+    d = math.sqrt(d_sq)
+    if d < (L1+L2):
+        beta = math.acos((L1*L1 + d_sq - L2*L2)/(2.0*L1*d))
+    elif
+        beta = 0
     q = beta + alpha - math.pi
     return q
 
