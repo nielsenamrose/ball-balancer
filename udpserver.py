@@ -66,7 +66,6 @@ UDPSock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 listen_addr = ("",21568)
 UDPSock.bind(listen_addr)
 print "Server listening on {0}".format(listen_addr)
-pwmenabled = False
 
 while True:
     data,addr = UDPSock.recvfrom(1024)
@@ -82,6 +81,6 @@ while True:
             v = v_max
         q = angle_to_q(math.radians(v))
         setangle(pwmpath[i], q)
-    	if not pwmenabled[i]:
+        if not pwmenabled[i]:
             startpwm(pwmpath[i], 20000000)
             pwmenabled[i] = True
