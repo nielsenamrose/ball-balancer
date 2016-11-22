@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import math
 
 import socket
 #import sys
@@ -12,8 +13,8 @@ def sendMessage(message):
     
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_address = ('localhost', 21568)
-#server_address = ('203.6.152.96', 21567)
+#server_address = ('localhost', 21568)
+server_address = ('203.6.152.96', 21568)
 cap = cv2.VideoCapture(0)
 
 while(1):
@@ -51,9 +52,14 @@ while(1):
     cv2.imshow('frame', frame)
     #cv2.imshow('mask', mask)
     #cv2.imshow('erosion', erosion)
-    x = (cx - 320, cy - 240)
-    u = calculateU(x)
-    sendMessage("E,{0:f},{1:f}".format(u[0], u[1]))
+    
+    x = 0.4*cx/640.0
+    y = 0.4*(480.0 - cy)/480.0
+    
+    v1 = math.atan((0.24 - x)/(y + 0.05))
+    v2 = math.atan((0.18 - x)/(y + 0.05))
+    
+    sendMessage("E,{0:f},{1:f}".format(math.degrees(v1), math.degrees(v2)))
     
     k = cv2.waitKey(5) & 0xFF
     if k == 27:

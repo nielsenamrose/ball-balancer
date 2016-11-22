@@ -6,9 +6,25 @@ Created on Fri Nov 11 08:12:25 2016
 """
 
 import socket
+import math
 
 pwm0path = "/sys/class/pwm/pwmchip0/pwm0"
 pwm1path = "/sys/class/pwm/pwmchip0/pwm1"
+
+L1 = 23.93
+L2 = 27.50
+L3 = 87.68
+L4 = 26.11
+L5 = 63.73
+
+def angle_to_q(v):
+    Bx = L5 - L3*math.cos(v)
+    By = L4 - L3*math.sin(v)
+    alpha = math.atan2(By,Bx)
+    d_sq = Bx*Bx + By*By
+    beta = math.acos((L1*L1 + d_sq - L2*L2)/(2.0*L1*math.sqrt(d_sq)))
+    q = beta + alpha - math.pi
+    return q
 
 def clamp(minx, maxx, x):
     if (x < minx):
@@ -19,7 +35,7 @@ def clamp(minx, maxx, x):
         return x
 
 def calculateduty(v):
-    duty = int((v / 45) * 600000 + 1500000)
+    duty = int((v*4.0 / math.pi) * 600000 + 1500000)
     return clamp(900000, 2100000, duty)
 
 def setvalue(path, value):
@@ -47,8 +63,10 @@ while True:
     data,addr = UDPSock.recvfrom(1024)
     print data.strip(),addr
     split = data.split(",")
-    q1 = float(split[1])
-    q2 = float(split[2])
+    v1 = math.radians(float(split[1]))
+    v2 = math.radians(float(split[2]))
+    q1 = angle_to_q(v1)
+    q2 = angle_to_q(v2)
     setangle(pwm0path, q1)
     setangle(pwm1path, q2)
     if not pwmenabled:
