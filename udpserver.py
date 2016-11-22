@@ -67,8 +67,8 @@ while True:
     v2 = math.radians(float(split[2]))
     q1 = angle_to_q(v1)
     q2 = angle_to_q(v2)
-    setangle(pwm0path, q1)
-    setangle(pwm1path, q2)
+    setangle(pwm0path, -q1)
+    setangle(pwm1path, -q2)
     if not pwmenabled:
         startpwm(pwm0path, 20000000)
         startpwm(pwm1path, 20000000)
