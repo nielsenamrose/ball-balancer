@@ -17,6 +17,9 @@ L3 = 87.68
 L4 = 26.11
 L5 = 63.73
 
+min_limit = -10
+max_limit = 10
+
 def angle_to_q(v):
     Bx = L5 - L3*math.cos(v)
     By = L4 - L3*math.sin(v)
@@ -67,10 +70,12 @@ while True:
     data,addr = UDPSock.recvfrom(1024)
     print data.strip(),addr
     split = data.split(",")
-    v1 = math.radians(float(split[1]))
-    v2 = math.radians(float(split[2]))
-    q1 = angle_to_q(v1)
-    q2 = angle_to_q(v2)
+    v1 = float(split[1])
+    v2 = float(split[2])
+    v1 = clamp(min_limit, max_limit, v1)
+    v2 = clamp(min_limit, max_limit, v2)
+    q1 = angle_to_q(math.radians(v1))
+    q2 = angle_to_q(math.radians(v2))
     setangle(pwm0path, -q1)
     setangle(pwm1path, -q2)
     if not pwmenabled:
