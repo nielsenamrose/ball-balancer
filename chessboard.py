@@ -17,48 +17,35 @@ cap = cv2.VideoCapture(0)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_address = ('203.6.152.96', 21568)
-
+ 
 def set_orientation(v1, v2):
     sock.sendto("E,{0:f},{1:f}".format(v1, v2), server_address)
-    cv2.waitKey(3000)
-
-for i in range(5):
-    v1 = i * 20.0/4 - 10.0
-    for j in range(5):
-        v2 = j * 20.0/4 - 10.0
-        
-        set_orientation(v1, v2)
-        
-        _, img = cap.read()
-        gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-
-        # Find the chess board corners
-        ret, corners = cv2.findChessboardCorners(gray, (7,7),None)
-
-        # If found, add object points, image points (after refining them)
-        if ret == True:
-            objpoints.append(objp)
     
-            cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
-            imgpoints.append(corners)
-    
-            # Draw and display the corners
-            cv2.drawChessboardCorners(img, (7,7), corners,ret)
-            cv2.imshow('img',img)
-        else:
-            print "Failed to find chessboard"
-            
 set_orientation(0, 0)
-#
-#
+
+key = 0
+while(key != 13):
+    _, img = cap.read()
+    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    ret, corners = cv2.findChessboardCorners(gray, (7,7),None)
+
+    if ret == True:
+        cv2.drawChessboardCorners(img, (7,7), corners,ret)
+        
+    cv2.imshow('img',img)
+    key = cv2.waitKey(5) & 0xFF
+
 _, img = cap.read()
+ret, corners = cv2.findChessboardCorners(gray, (7,7), None)
+objpoints.append(objp)
+cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
+imgpoints.append(corners)
 
 ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1],None,None)
 
 coord = np.float32([(0,0,0),(0.100,0,0),(0,0.100,0),(0,0,0.100)])
-p,_ = cv2.projectPoints(coord, rvecs[12], tvecs[12], mtx, dist)
+p,_ = cv2.projectPoints(coord, rvecs[0], tvecs[0], mtx, dist)
 p = p.reshape(-1,2)
-print p
 cv2.line(img,tuple(p[0]),tuple(p[1]),(0,0,255),2)
 cv2.line(img,tuple(p[0]),tuple(p[2]),(0,255,0),2)
 cv2.line(img,tuple(p[0]),tuple(p[3]),(255,0,0),2)
