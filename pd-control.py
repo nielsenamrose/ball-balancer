@@ -44,7 +44,7 @@ F = np.array([[0, 0, 1, 0],
 
 C = np.array([[0, 0],
               [0, 0],
-              [-3.0/5.0*g, 0],
+              [3.0/5.0*g, 0],
               [3.0/5.0*g, 0]], np.float32)
 
 H = np.array([[ 1, 0, 0, 0],
@@ -65,8 +65,8 @@ x_hat_series = deque([])
 
 # Controller
 
-K = np.array([[ 0.8, 0.0, 0.3, 0.0],
-              [ 0.0, -.8, 0.0, -0.3]]) 
+K = np.array([[ 2.0, 0.0, 0.5, 0.0],
+              [ 0.0, 2.0, 0.0, 0.5]]) 
 
 w = np.array([0.0, 0.0, 0.0, 0.0]) # set point
 e_series = deque([])
@@ -103,7 +103,7 @@ def xy_to_uv(z, u):
     return m[0:2]/m[2,0] 
     
 def set_orientation(u):
-    sock.sendto("E,{0:f},{1:f}".format(math.degrees(u[0]), math.degrees(u[1])), server_address)
+    sock.sendto("E,{0:f},{1:f}".format(-math.degrees(u[0]), math.degrees(u[1])), server_address)
     #sock.sendto("E,{0:f},{1:f}".format(0, 0), server_address)
     None
 
@@ -119,11 +119,11 @@ def step(w):
     
     # Update estimated state
     
-    x_hat = x_hat + dt*(F.dot(x_hat) + C.dot(u)) 
+    x_hat = x_hat + dt*(F.dot(x_hat))# + C.dot(u)) 
 
     # Update Ru
 
-    K_hat = np.array([u[1], u[0], 0.0])
+    K_hat = np.array([-u[1], u[0], 0.0])
     theta = np.linalg.norm(K_hat)
     if theta > 0.01:
         K_hat *= math.asin(theta)/theta
@@ -152,7 +152,7 @@ def step(w):
     x_hat = np.clip(x_hat, x_hat_min, x_hat_max)
        
     # Controller    
-    e = x_hat - w 
+    e = w - x_hat 
     u = K.dot(e)
     u = np.clip(u, -0.14, 0.14)
     
@@ -234,7 +234,7 @@ finally:
     cap.release()
     cv2.destroyAllWindows()
     
-#plt.plot(t_series, x_hat_series, label="z_hat")
-#plt.plot(t_series, u_series, label="u")
-plt.plot(t_series, dt_series, label="dt")
+plt.plot(t_series, x_hat_series, label="z_hat")
+plt.plot(t_series, u_series, label="u")
+#plt.plot(t_series, dt_series, label="dt")
 plt.legend()

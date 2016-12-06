@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 cap = cv2.VideoCapture(0)
-
+cap.set(cv2.cv.CV_CAP_PROP_FPS, 10)
 while(1):
     _, frame = cap.read()
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -15,5 +15,5 @@ while(1):
 
 print hsv0
     
-cap.release();
+cap.release()
 cv2.destroyAllWindows()
