@@ -15,17 +15,21 @@ rB = 0.03952/2.0
 
 # Vision
 
-
-
 lower = np.array((hsv0[0]-10, hsv0[1]-40, hsv0[2]-40))
 upper = np.array((hsv0[0]+10, 255, 255))
 
 kernel = np.ones((10,10), np.uint8)
 
 R = cv2.Rodrigues(rvecs[0])[0]
+
 ARt = mtx.dot(np.hstack((R,tvecs[0])))  
+
 Ru = np.identity(4)
-T = np.array([[1,0,0],[0,1,0],[0,0,-rB],[0,0,1]], np.float32)  
+
+T = np.array([[1,0,0],
+              [0,1,0],
+              [0,0,-rB],
+              [0,0,1]], np.float32)  
 
 t0 = cv2.getTickCount()
 f = 1.0 * cv2.getTickFrequency()
@@ -42,33 +46,39 @@ F = np.array([[0, 0, 1, 0],
               [0, 0, 0, 0],
               [0, 0, 0, 0]], np.float32)
 
+c = 3.0/5.0*g
+
 C = np.array([[0, 0],
               [0, 0],
-              [3.0/5.0*g, 0],
-              [3.0/5.0*g, 0]], np.float32)
+              [c, 0],
+              [0, c]], np.float32)
 
 H = np.array([[ 1, 0, 0, 0],
               [ 0, 1, 0, 0]], np.float32)
 
-Kp = np.array([[0.33, 0.0],
-               [0.0, 0.33],
-               [0.33, 0.0],
-               [0.0, 0.33]], np.float32)
+Kp = np.array([[0.5, 0.0],
+               [0.0, 0.5],
+               [0.2, 0.0],
+               [0.0, 0.2]], np.float32)
 
 
 
-x_hat_min = np.array([-0.225, -0.225, -1.0, -1.0])
-x_hat_max = np.array([0.225, 0.225, 1.0, 1.0])
+x_hat_min = np.array([-0.2, -0.2, -1.0, -1.0])
+x_hat_max = np.array([0.2, 0.2, 1.0, 1.0])
 
 x_hat = np.array([0.0, 0.0, 0.0, 0.0])
 x_hat_series = deque([])
 
 # Controller
 
-K = np.array([[ 2.0, 0.0, 0.5, 0.0],
-              [ 0.0, 2.0, 0.0, 0.5]]) 
+K = np.array([[ 1.5, 0.0, 0.5, 0.0],
+              [ 0.0, 1.5, 0.0, 0.5]]) 
+
+Ki = np.array([[0.05, 0.0, 0.0, 0.0],
+               [0.0, 0.05, 0.0, 0.0]])
 
 w = np.array([0.0, 0.0, 0.0, 0.0]) # set point
+i = np.zeros(4)
 e_series = deque([])
 u = np.array([0.0, 0.0])
 u_series = deque([])
@@ -107,23 +117,34 @@ def set_orientation(u):
     #sock.sendto("E,{0:f},{1:f}".format(0, 0), server_address)
     None
 
+def get_time():
+    return (cv2.getTickCount() - t0) / f
+    
+N = 0
+
 def step(w):
     global t
+    global N
     global t_old
+    global i
     global u
     global x_hat
 
     _, frame = cap.read()
-    t = (cv2.getTickCount() - t0) / f
-    dt = t - t_old
+    t = get_time()
+    N += 1
+    dt = t / N
+    #dt = t - t_old
+
     
     # Update estimated state
     
-    x_hat = x_hat + dt*(F.dot(x_hat))# + C.dot(u)) 
+    v = np.array([0.0, 0.00])
+    x_hat = x_hat + dt*(F.dot(x_hat) + C.dot(u + v)) 
 
     # Update Ru
 
-    K_hat = np.array([-u[1], u[0], 0.0])
+    K_hat = np.array([u[1], -u[0], 0.0])
     theta = np.linalg.norm(K_hat)
     if theta > 0.01:
         K_hat *= math.asin(theta)/theta
@@ -145,7 +166,7 @@ def step(w):
         z = np.array([m[0,0],m[1,0]])/m[2,0]
     
     # Estimator
-        
+    
     z_tilt = z - H.dot(x_hat)
     Kdt = np.diag([1.0, 1.0, 1.0/dt, 1.0/dt])
     x_hat += Kdt.dot(Kp).dot(z_tilt)
@@ -153,7 +174,9 @@ def step(w):
        
     # Controller    
     e = w - x_hat 
-    u = K.dot(e)
+    i += e
+    u = K.dot(e)# + Ki.dot(i)
+    print x_hat, u
     u = np.clip(u, -0.14, 0.14)
     
     set_orientation(u)
@@ -174,11 +197,11 @@ def step(w):
 
 def goto(x_start, x_end, speed = 0, tolerance = None):
     global t
+    t_start = t
     distance = np.linalg.norm(x_end - x_start)
     T = 0.0
     if speed > 0.0:
         T = distance/speed
-    t_start = t
     w = np.zeros(4)
     while(True):
         s = 1.0
@@ -187,15 +210,15 @@ def goto(x_start, x_end, speed = 0, tolerance = None):
         w[0:2] = x_start*(1.0 - s) + x_end*s
         if T > 0.0:
             w[2:4] = (x_end - x_start)/T
-        e = step(w)
+        t, e = step(w)
         cv2.waitKey(5)
         if (s == 1.0 and (tolerance == None or e < tolerance) ):
             break
 
 def home():
     goto(x_hat[0:2], np.array([0, 0]), -1, 0.08)
-    goto(np.array([0, 0]), np.array([0.07, 0.07]), 0.04, 0.05)
-    set_orientation([-2.0, 2.0])
+    goto(np.array([0, 0]), np.array([-0.08, -0.08]), 0.04, 0.08)
+    set_orientation([-0.05, -0.05])
     
 try:
     cap = cv2.VideoCapture(0)
@@ -222,12 +245,10 @@ try:
         if (e > 0.2):
             t_wake = t
         key = cv2.waitKey(5) & 0xFF
-#        if t - t_wake > 60.0:
-#            break
+#        if t - t_wake > 10.0:
 #            home()
 #            detect_motion()
 #            t_old = t = t_wake = get_time()
-    # home()
 
 finally:
     sock.close()
@@ -236,5 +257,5 @@ finally:
     
 plt.plot(t_series, x_hat_series, label="z_hat")
 plt.plot(t_series, u_series, label="u")
-#plt.plot(t_series, dt_series, label="dt")
+plt.plot(t_series, dt_series, label="dt")
 plt.legend()

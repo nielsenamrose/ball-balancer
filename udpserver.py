@@ -80,7 +80,7 @@ while True:
             print "Warning angle {0} above limit {1}".format(v, v_max)
             v = v_max
         q = angle_to_q(math.radians(v))
-        setangle(pwmpath[i], q)
         if not pwmenabled[i]:
             startpwm(pwmpath[i], 20000000)
             pwmenabled[i] = True
+        setangle(pwmpath[i], q)
