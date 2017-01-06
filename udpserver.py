@@ -83,4 +83,4 @@ while True:
         if not pwmenabled[i]:
             startpwm(pwmpath[i], 20000000)
             pwmenabled[i] = True
-        setangle(pwmpath[i], q)d
+        setangle(pwmpath[i], q)
