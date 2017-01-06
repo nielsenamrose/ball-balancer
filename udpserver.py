@@ -8,7 +8,7 @@ Created on Fri Nov 11 08:12:25 2016
 import socket
 import math
 
-pwmpath = ["/sys/class/pwm/pwmchip0/pwm0",
+pwmpaths = ["/sys/class/pwm/pwmchip0/pwm0",
 	   "/sys/class/pwm/pwmchip0/pwm1"]
 
 pwmenabled = [ False, False ]
@@ -82,7 +82,7 @@ while True:
             print "Warning angle {0} above limit {1}".format(v, v_max)
             v = v_max
         q = angle_to_q(math.radians(v))
-        pwmpath = pwmpath[i]
+        pwmpath = pwmpaths[i]
         setperiod(pwmpath, 20000000)
         setangle(pwmpath, q)
         setenable(pwmpath)
