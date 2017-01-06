@@ -51,9 +51,11 @@ def setvalue(path, value):
     f = open(path,"w")   
     f.write(str(value))
     
-def startpwm(path, period):
+def setperiod(path, period):
     setvalue(path+"/period", period)    
-    setvalue(path+"/enable", 1)
+    
+def setenable(path):
+    setvalue(path+"/enable")
     
 def setdutycycle(path, dutycycle):
     setvalue(path+"/duty_cycle", dutycycle)
@@ -80,7 +82,6 @@ while True:
             print "Warning angle {0} above limit {1}".format(v, v_max)
             v = v_max
         q = angle_to_q(math.radians(v))
-        if not pwmenabled[i]:
-            startpwm(pwmpath[i], 20000000)
-            pwmenabled[i] = True
+        setperiod(pwmpath[i], 20000000)
         setangle(pwmpath[i], q)
+        setenable(pwmpath[i])
