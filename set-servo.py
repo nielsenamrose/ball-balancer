@@ -69,5 +69,5 @@ setenable(pwmpath)
 t0 = time.time()
 
 for i in range(1000):
-    print time.time() - t0 + "," + readvalue(adcpath)
+    print time.time() - t0, ",", readvalue(adcpath)
     
