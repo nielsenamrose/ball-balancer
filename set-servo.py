@@ -11,7 +11,8 @@ import sys
 pwmpaths = ["/sys/class/pwm/pwmchip0/pwm0",
 	   "/sys/class/pwm/pwmchip0/pwm1"]
     
-adcpaths = ["/sys/bus/iio/devices/iio:device0/in_voltage0_raw"]
+adcpaths = ["/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
+"/sys/bus/iio/devices/iio:device0/in_voltage0_raw"]
 
 #pwmpaths = ["c:/temp/pwm0",
 #	   "c:/temp/pwm1"]
