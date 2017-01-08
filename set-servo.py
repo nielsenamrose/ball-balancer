@@ -76,6 +76,7 @@ u_sum = 0.0
 for i in range(1000):
     u = readvalue(adcpath)
     u_sum += u
+    n = n + 1
     actual = (u - u_min)/(u_max - u_min) * 90.0 - 45.0 
     print time.time() - t0, u, actual
     
