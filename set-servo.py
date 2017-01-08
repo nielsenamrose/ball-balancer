@@ -64,6 +64,6 @@ setperiod(pwmpath, 20000000)
 setangle(pwmpath, math.radians(angle))
 setenable(pwmpath)
 
-for i in range(10):
+for i in range(1000):
     print readvalue(adcpath)
     
