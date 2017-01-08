@@ -20,6 +20,9 @@ adcpaths = ["/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
 #    
 #adcpaths = ["c:/temp/in_voltage0_raw"]
 
+degneg45_u = [1582, 1516]
+deg45_u = [3777, 3626]
+
 def clamp(minx, maxx, x):
     if (x < minx):
         return minx
@@ -61,6 +64,8 @@ angle = float(sys.argv[2])
 
 pwmpath = pwmpaths[servo_index]
 adcpath = adcpaths[servo_index]
+u_min = degneg45_u[servo_index]
+u_max = deg45_u[servo_index]
 
 setperiod(pwmpath, 20000000)
 setangle(pwmpath, math.radians(angle))
@@ -69,5 +74,7 @@ setenable(pwmpath)
 t0 = time.time()
 
 for i in range(1000):
-    print time.time() - t0, ",", readvalue(adcpath)
+    u = readvalue(adcpath)
+    actual = (u - u_min)/(u_max - u_min) * 90.0 - 45.0 
+    print time.time() - t0, u, actual
     
