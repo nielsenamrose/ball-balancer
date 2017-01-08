@@ -41,7 +41,7 @@ def setvalue(path, value):
    
 def readvalue(path):
     f = open(path,"r")   
-    return int(f.readline())
+    return float(f.readline())
     
 def setperiod(path, period):
     setvalue(path+"/period", period)    
@@ -56,8 +56,6 @@ def setangle(pwmpath, angle):
     duty = calculateduty(angle)
     setdutycycle(pwmpath, duty)
 
-def readvoltage(adcpath):
-    return readvalue()
     
 servo_index = int(sys.argv[1])
 angle = float(sys.argv[2])
