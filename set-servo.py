@@ -7,6 +7,7 @@ Created on Sun Jan 08 15:49:15 2017
 
 import math
 import sys
+import time
 
 pwmpaths = ["/sys/class/pwm/pwmchip0/pwm0",
 	   "/sys/class/pwm/pwmchip0/pwm1"]
@@ -65,6 +66,8 @@ setperiod(pwmpath, 20000000)
 setangle(pwmpath, math.radians(angle))
 setenable(pwmpath)
 
+t0 = time.time()
+
 for i in range(1000):
-    print readvalue(adcpath)
+    print time.time() - t0 + "," + readvalue(adcpath)
     
