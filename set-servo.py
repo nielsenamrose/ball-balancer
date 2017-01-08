@@ -20,8 +20,8 @@ adcpaths = ["/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
 #    
 #adcpaths = ["c:/temp/in_voltage0_raw"]
 
-degneg45_u = [1582, 1516]
-deg45_u = [3777, 3626]
+degneg45_u = [1580.698, 1513.921]
+deg45_u = [3776.617, 3626.202]
 
 def clamp(minx, maxx, x):
     if (x < minx):
