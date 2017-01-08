@@ -70,9 +70,13 @@ setangle(pwmpath, math.radians(angle))
 setenable(pwmpath)
 
 t0 = time.time()
+n = 0
+u_sum = 0.0
 
 for i in range(1000):
     u = readvalue(adcpath)
+    u_sum += u
     actual = (u - u_min)/(u_max - u_min) * 90.0 - 45.0 
     print time.time() - t0, u, actual
     
+print u_sum / n
