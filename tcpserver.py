@@ -7,17 +7,17 @@ Created on Tue Jan 10 15:56:06 2017
 
 import SocketServer
 
-#pwmpaths = ["/sys/class/pwm/pwmchip0/pwm0",
-#            "/sys/class/pwm/pwmchip0/pwm1"]
-#    
-#adcpaths = ["/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
-#            "/sys/bus/iio/devices/iio:device0/in_voltage0_raw"]
-
-pwmpaths = ["d:/temp/pwm0",
-            "d:/temp/pwm1"]
+pwmpaths = ["/sys/class/pwm/pwmchip0/pwm0",
+            "/sys/class/pwm/pwmchip0/pwm1"]
     
-adcpaths = ["d:/temp/in_voltage1_raw", 
-            "d:/temp/in_voltage0_raw"]
+adcpaths = ["/sys/bus/iio/devices/iio:device0/in_voltage1_raw",
+            "/sys/bus/iio/devices/iio:device0/in_voltage0_raw"]
+
+#pwmpaths = ["d:/temp/pwm0",
+#            "d:/temp/pwm1"]
+#    
+#adcpaths = ["d:/temp/in_voltage1_raw", 
+#            "d:/temp/in_voltage0_raw"]
 
 degneg45_u = [1580.698, 1513.921]
 deg45_u = [3776.617, 3626.202]
