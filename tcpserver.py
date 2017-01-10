@@ -64,7 +64,8 @@ def readangle(servo_index):
 class RequestHandler(SocketServer.BaseRequestHandler):
 
     def handle(self):
-        data = self.request.recv(1024).strip()
+        data = self.request[0].strip()
+        socket = self.request[1]
         split = data.split(",")
         command = split[0].lower()
         response = "ack"
@@ -74,7 +75,7 @@ class RequestHandler(SocketServer.BaseRequestHandler):
         elif (command == "r"):
             v1, v2 = readangle(0), readangle(1)
             response = "{0},{1}".format(v1, v2)
-        self.request.sendall(response)
+        socket.sendto(response, self.client_address)
         print "{0}: {1} => {2}".format(self.client_address[0], data, response)
 
 if __name__ == "__main__":
@@ -84,5 +85,5 @@ if __name__ == "__main__":
         setenable(pwmpaths[i])
 
     HOST, PORT = "", 21568
-    server = SocketServer.TCPServer((HOST, PORT), RequestHandler)
+    server = SocketServer.UDPServer((HOST, PORT), RequestHandler)
     server.serve_forever()

@@ -6,28 +6,34 @@ Created on Tue Jan 10 16:47:40 2017
 """
 
 import socket
+import time
 import matplotlib.pyplot as plt
+from collections import deque
 
 HOST, PORT = "203.6.152.96", 21568
-data = "r,-10,-10"
-
-# Create a socket (SOCK_STREAM means a TCP socket)
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-def send(data):
-    try:
-        # Connect to server and send data
-        sock.connect((HOST, PORT))
-        sock.sendall(data + "\n")
+t_series = deque([])        
+v_series = deque([])       
+        
+try:
+    sock.connect((HOST, PORT))
+#    sock.sendall("s,-45,-45")
+#    data = sock.recv(1024)
+#    print data
+    t0 = time.time()
     
-        # Receive data from the server and shut down
-        received = sock.recv(1024)
-    finally:
-        sock.close()
+    for x in range(10):
+        t = time.time() - t0
+        sock.sendall("r")
+        data = sock.recv(1024)
+        print "{0}: {1} {2}".format(t, data, len(data))
+#        split = data.split(",")
+#        v = (float(split[0]), float(split[1]))
+#        t_series.append(t)
+#        v_series.append(v)
 
+finally:
+    sock.close()
         
-send("s,-45,-45")
-
-        
-print "Sent:     {}".format(data)
-print "Received: {}".format(received)
+plt.plot(t_series, v_series, label="v")
