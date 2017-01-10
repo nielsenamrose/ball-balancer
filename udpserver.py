@@ -11,8 +11,6 @@ import math
 pwmpaths = ["/sys/class/pwm/pwmchip0/pwm0",
 	   "/sys/class/pwm/pwmchip0/pwm1"]
 
-pwmenabled = [ False, False ]
-
 L1 = 23.93
 L2 = 27.50
 L3 = 87.68
