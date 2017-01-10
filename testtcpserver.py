@@ -17,17 +17,16 @@ t_series = deque([])
 v_series = deque([])       
         
 try:
-    sock.sendto("s,40,40", server_address)
+    sock.sendto("s,-40,-40", server_address)
     data = sock.recv(1024)
-    print data
+    #print data
     t0 = time.time()
     
-    for x in range(10):
+    for x in range(200):
         t = time.time() - t0
         sock.sendto("r", server_address)
         data = sock.recv(1024)
-        
-        print "{0}: {1} {2}".format(t, data, len(data))
+        #print "{0}: {1} {2}".format(t, data, len(data))
         split = data.split(",")
         v = (float(split[0]), float(split[1]))
         t_series.append(t)
