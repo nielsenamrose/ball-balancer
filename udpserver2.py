@@ -84,6 +84,6 @@ if __name__ == "__main__":
         setangle(i, readangle(i))
         setenable(pwmpaths[i])
 
-    HOST, PORT = "", 21568
-    server = SocketServer.UDPServer((HOST, PORT), RequestHandler)
+    server_address = ("", 21568)
+    server = SocketServer.UDPServer(server_address, RequestHandler)
     server.serve_forever()
