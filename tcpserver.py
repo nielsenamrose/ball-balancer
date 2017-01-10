@@ -65,17 +65,17 @@ class RequestHandler(SocketServer.BaseRequestHandler):
 
     def handle(self):
         data = self.request.recv(1024).strip()
-        print "{0}: {1}".format(self.client_address[0], data)
         split = data.split(",")
         command = split[0].lower()
+        response = "ack"
         if (command == "s"):
             setangle(0, float(split[1]))
-            setangle(1, float(split[2]))
+            setangle(1, float(split[2]))            
         elif (command == "r"):
             v1, v2 = readangle(0), readangle(1)
             response = "{0},{1}".format(v1, v2)
-            self.request.sendall(response)
-            print "response:{}".format(response)
+        self.request.sendall(response)
+        print "{0}: {1} => {2}".format(self.client_address[0], data, response)
 
 if __name__ == "__main__":
     for i in range(2):
