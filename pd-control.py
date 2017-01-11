@@ -83,6 +83,32 @@ e_series = deque([])
 u = np.array([0.0, 0.0])
 u_series = deque([])
 
+# actuator
+
+L1 = 23.93
+L2 = 27.50
+L3 = 87.68
+L4 = 26.11
+L5 = 63.73
+
+calib_offset = np.array([-6.0, -1.0])
+
+def angle_to_q(v):
+    Bx = L5 - L3*math.cos(v)
+    By = L4 - L3*math.sin(v)
+    alpha = math.atan2(By,Bx)
+    d_sq = Bx*Bx + By*By
+    d = math.sqrt(d_sq)
+    if d < (L1+L2):
+        beta = math.acos((L1*L1 + d_sq - L2*L2)/(2.0*L1*d))
+    else:
+        beta = 0
+    q = beta + alpha - math.pi
+    return q
+
+def inverse_kin(u):
+    return np.array([angle_to_q(u[0]), angle_to_q(u[1])])
+    
 def detect_motion():
     cv2.waitKey(1000)
     ret, frame = cap.read()
@@ -112,11 +138,19 @@ def xy_to_uv(z, u):
     m = ARt.dot(Ru).dot(np.array([[z[0],z[1],0.0,1.0]]).T)
     return m[0:2]/m[2,0] 
     
-def set_orientation(u):
-    sock.sendto("E,{0:f},{1:f}".format(-math.degrees(u[0]), math.degrees(u[1])), server_address)
-    #sock.sendto("E,{0:f},{1:f}".format(0, 0), server_address)
-    None
+def set_servo_pos(u):
+    sock.sendto("s,{0:f},{1:f}".format(math.degrees(u[0]), math.degrees(u[1])), server_address)
 
+def request_servo_pos():
+    sock.sendto("r", server_address)
+    
+def read_servo_pos():
+    data = sock.recv(1024)
+    split = data.split(",")
+    q1 = math.radians(float(split[0]))
+    q2 = math.radians(float(split[1]))
+    return np.array([q1, q2])
+    
 def get_time():
     return (cv2.getTickCount() - t0) / f
     
@@ -130,17 +164,15 @@ def step(w):
     global u
     global x_hat
 
+    request_servo_pos()
     _, frame = cap.read()
+    q = read_servo_pos() - calib_offset
     t = get_time()
-    N += 1
-    dt = t / N
-    #dt = t - t_old
+    dt = t - t_old
 
-    
     # Update estimated state
     
-    v = np.array([0.0, 0.00])
-    x_hat = x_hat + dt*(F.dot(x_hat) + C.dot(u + v)) 
+    x_hat = x_hat + dt*(F.dot(x_hat) + C.dot(u)) 
 
     # Update Ru
 
@@ -173,13 +205,16 @@ def step(w):
     x_hat = np.clip(x_hat, x_hat_min, x_hat_max)
        
     # Controller    
+    
     e = w - x_hat 
     i += e
     u = K.dot(e)# + Ki.dot(i)
     print x_hat, u
     u = np.clip(u, -0.14, 0.14)
     
-    set_orientation(u)
+    q = inverse_kin(u) + calib_offset
+    set_servo_pos(q)
+    
     t_old = t
     error = np.linalg.norm(e)
     
@@ -218,7 +253,7 @@ def goto(x_start, x_end, speed = 0, tolerance = None):
 def home():
     goto(x_hat[0:2], np.array([0, 0]), -1, 0.08)
     goto(np.array([0, 0]), np.array([-0.08, -0.08]), 0.04, 0.08)
-    set_orientation([-0.05, -0.05])
+    set_servo_pos(math.radians(20), math.radians(20))
     
 try:
     cap = cv2.VideoCapture(0)

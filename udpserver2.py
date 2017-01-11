@@ -68,15 +68,15 @@ class RequestHandler(SocketServer.BaseRequestHandler):
         socket = self.request[1]
         split = data.split(",")
         command = split[0].lower()
-        response = "ack"
         if (command == "s"):
             setangle(0, float(split[1]))
-            setangle(1, float(split[2]))            
+            setangle(1, float(split[2]))
+            print "{0}: {1}".format(self.client_address[0], data)            
         elif (command == "r"):
             v1, v2 = readangle(0), readangle(1)
             response = "{0},{1}".format(v1, v2)
-        socket.sendto(response, self.client_address)
-        print "{0}: {1} => {2}".format(self.client_address[0], data, response)
+            socket.sendto(response, self.client_address)
+            print "{0}: {1} => {2}".format(self.client_address[0], data, response)
 
 if __name__ == "__main__":
     for i in range(2):
