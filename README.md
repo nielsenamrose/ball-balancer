@@ -1,3 +1,13 @@
-# beagleproject1
+# 2 dof ball balancer
 
-My BeagleBone project
+Learning project 1: 2 DOF Ball Balancer
+
+* Git/GitHub
+
+* Python
+
+* Computer vision using OpenCV
+
+* Control
+
+* Linux
