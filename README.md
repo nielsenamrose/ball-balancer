@@ -1,13 +1,16 @@
-# 2 dof ball balancer
-
-Learning project 1: 2 DOF Ball Balancer
+# Learning project 1: 2 DOF Ball Balancer
 
 * Git/GitHub
 
-* Python
+* Python programming with Numpy
 
 * Computer vision using OpenCV
 
-* Control
+* Control theory
 
-* Linux
+* BeagleBone with Debian Linux
+
+
+
+
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/s9N7xMRh3qo/0.jpg)](http://www.youtube.com/watch?v=s9N7xMRh3qo)
